@@ -22,10 +22,12 @@ jwt = JWTManager(app)
 app.config['JWT_BLACKLIST_ENABLED'] = True
 app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']
 
-@jwt.token_in_blacklist_loader
-def check_if_token_in_blacklist(decrypted_token):
-    jti = decrypted_token['jti']
+@jwt.token_in_blocklist_loader
+def check_if_token_is_revoked(jwt_header, jwt_payload):
+    jti = jwt_payload["jti"]
     return models.RevokedTokenModel.is_jti_blacklisted(jti)
+    #token_in_redis = jwt_redis_blocklist.get(jti)
+    #return token_in_redis is not None
 
 import views, models, resources
 
